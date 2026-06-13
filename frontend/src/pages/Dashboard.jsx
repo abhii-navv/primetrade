@@ -1,40 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import '../styles.css';
 
-const s = {
-  page: { minHeight: '100vh', background: '#0f0f0f', fontFamily: "'DM Sans', sans-serif", color: '#fff' },
-  nav: { background: '#1a1a1a', borderBottom: '1px solid #2a2a2a', padding: '14px 32px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' },
-  brand: { fontFamily: "'Space Mono', monospace", fontSize: 16, color: '#fff' },
-  navRight: { display: 'flex', alignItems: 'center', gap: 16 },
-  badge: { background: '#4f46e5', color: '#fff', fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 600 },
-  logoutBtn: { background: 'transparent', border: '1px solid #333', color: '#aaa', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontSize: 13 },
-  main: { maxWidth: 800, margin: '0 auto', padding: '40px 24px' },
-  heading: { fontSize: 22, fontFamily: "'Space Mono', monospace", marginBottom: 24 },
-  form: { background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12, padding: 24, marginBottom: 32 },
-  formTitle: { fontSize: 15, fontWeight: 600, color: '#ccc', marginBottom: 16, marginTop: 0 },
-  input: { width: '100%', background: '#111', border: '1px solid #333', borderRadius: 8, padding: '10px 14px', color: '#fff', fontSize: 14, boxSizing: 'border-box', marginBottom: 12, outline: 'none' },
-  textarea: { width: '100%', background: '#111', border: '1px solid #333', borderRadius: 8, padding: '10px 14px', color: '#fff', fontSize: 14, boxSizing: 'border-box', marginBottom: 12, resize: 'vertical', outline: 'none' },
-  btn: { background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 8, padding: '10px 20px', fontSize: 14, fontWeight: 600, cursor: 'pointer' },
-  taskCard: { background: '#1a1a1a', border: '1px solid #2a2a2a', borderRadius: 12, padding: 20, marginBottom: 12 },
-  taskHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' },
-  taskTitle: { fontSize: 16, fontWeight: 600, marginBottom: 4 },
-  taskDesc: { color: '#777', fontSize: 13, marginBottom: 12 },
-  taskMeta: { display: 'flex', gap: 8, alignItems: 'center' },
-  actions: { display: 'flex', gap: 8 },
-  editBtn: { background: '#333', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
-  deleteBtn: { background: '#2a1010', color: '#f87171', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 12 },
-  statusBadge: { fontSize: 11, padding: '3px 10px', borderRadius: 20, fontWeight: 600, textTransform: 'uppercase' },
-  select: { background: '#111', border: '1px solid #333', borderRadius: 6, color: '#fff', padding: '4px 8px', fontSize: 12 },
-  toast: { position: 'fixed', bottom: 24, right: 24, background: '#1a3a2a', border: '1px solid #2a5a3a', color: '#4ade80', borderRadius: 8, padding: '12px 20px', fontSize: 14 },
-  empty: { color: '#444', textAlign: 'center', padding: 40 },
-};
-
-const statusColors = {
-  pending: { background: '#1a2a3a', color: '#60a5fa' },
-  in_progress: { background: '#2a2a1a', color: '#facc15' },
-  done: { background: '#0f2a1a', color: '#4ade80' },
-};
+const STATUS_LABEL = { pending: 'Pending', in_progress: 'In Progress', done: 'Done' };
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -45,10 +14,7 @@ export default function Dashboard() {
   const [toast, setToast] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const showToast = (msg) => {
-    setToast(msg);
-    setTimeout(() => setToast(''), 3000);
-  };
+  const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(''), 3000); };
 
   const loadTasks = async () => {
     try {
@@ -69,7 +35,7 @@ export default function Dashboard() {
       await api.post('/tasks', form);
       setForm({ title: '', description: '' });
       loadTasks();
-      showToast('Task created!');
+      showToast('Task created');
     } catch (err) {
       alert(err.response?.data?.message || 'Error creating task');
     }
@@ -80,7 +46,7 @@ export default function Dashboard() {
       await api.put(`/tasks/${id}`, updates);
       loadTasks();
       setEditTask(null);
-      showToast('Task updated!');
+      showToast('Task updated');
     } catch (err) {
       alert(err.response?.data?.message || 'Error updating task');
     }
@@ -93,96 +59,112 @@ export default function Dashboard() {
       loadTasks();
       showToast('Task deleted');
     } catch (err) {
-      alert(err.response?.data?.message || 'Error deleting task');
+      alert(err.response?.data?.message || 'Error');
     }
   };
 
-  const logout = () => {
-    localStorage.clear();
-    navigate('/login');
-  };
+  const logout = () => { localStorage.clear(); navigate('/login'); };
 
   return (
-    <div style={s.page}>
-      <nav style={s.nav}>
-        <span style={s.brand}>task_manager</span>
-        <div style={s.navRight}>
-          <span style={{ color: '#aaa', fontSize: 14 }}>{user.name}</span>
-          <span style={s.badge}>{user.role}</span>
-          <button style={s.logoutBtn} onClick={logout}>Logout</button>
+    <div className="dashboard">
+      <nav className="nav">
+        <div className="nav-brand">
+          <div className="nav-brand-dot" />
+          TaskFlow
+        </div>
+        <div className="nav-right">
+          <span className="nav-user">{user.name}</span>
+          <span className="nav-badge">{user.role}</span>
+          <button className="btn btn-sm btn-ghost" onClick={logout}>Logout</button>
         </div>
       </nav>
 
-      <main style={s.main}>
-        <h1 style={s.heading}>My Tasks</h1>
+      <main className="dash-main">
+        <div className="dash-header">
+          <h1 className="dash-title">My Tasks</h1>
+          {!loading && <span className="dash-count">{tasks.length} task{tasks.length !== 1 ? 's' : ''}</span>}
+        </div>
 
         {/* Create form */}
-        <div style={s.form}>
-          <p style={s.formTitle}>+ New Task</p>
+        <div className="create-form">
+          <p className="create-form-title">New Task</p>
           <form onSubmit={handleCreate}>
-            <input style={s.input} placeholder="Task title *" required value={form.title}
-              onChange={(e) => setForm({ ...form, title: e.target.value })} />
-            <textarea style={s.textarea} placeholder="Description (optional)" rows={2} value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })} />
-            <button style={s.btn} type="submit">Add Task</button>
+            <div className="field" style={{ marginBottom: 10 }}>
+              <input className="input" placeholder="Task title *" required
+                value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+            </div>
+            <div className="field" style={{ marginBottom: 10 }}>
+              <textarea className="textarea" placeholder="Description (optional)" rows={2}
+                value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+            </div>
+            <button className="btn btn-save btn-sm" type="submit">+ Add Task</button>
           </form>
         </div>
 
         {/* Task list */}
         {loading ? (
-          <p style={s.empty}>Loading...</p>
+          <div className="empty"><div className="empty-icon">⏳</div>Loading your tasks…</div>
         ) : tasks.length === 0 ? (
-          <p style={s.empty}>No tasks yet. Create one above!</p>
+          <div className="empty">
+            <div className="empty-icon">📋</div>
+            No tasks yet — add one above!
+          </div>
         ) : (
-          tasks.map((task) => (
-            <div key={task.id} style={s.taskCard}>
-              {editTask === task.id ? (
-                <EditForm task={task} onSave={(u) => handleUpdate(task.id, u)} onCancel={() => setEditTask(null)} />
-              ) : (
-                <>
-                  <div style={s.taskHeader}>
-                    <div>
-                      <div style={s.taskTitle}>{task.title}</div>
-                      {task.description && <div style={s.taskDesc}>{task.description}</div>}
+          <div className="task-list">
+            {tasks.map((task) => (
+              <div key={task.id} className="task-card">
+                {editTask === task.id ? (
+                  <EditForm task={task} onSave={(u) => handleUpdate(task.id, u)} onCancel={() => setEditTask(null)} />
+                ) : (
+                  <>
+                    <div className="task-top">
+                      <div>
+                        <div className="task-title">{task.title}</div>
+                        {task.description && <div className="task-desc">{task.description}</div>}
+                      </div>
+                      <div className="task-actions">
+                        <button className="btn btn-sm btn-ghost" onClick={() => setEditTask(task.id)}>Edit</button>
+                        <button className="btn btn-sm btn-danger" onClick={() => handleDelete(task.id)}>Delete</button>
+                      </div>
                     </div>
-                    <div style={s.actions}>
-                      <button style={s.editBtn} onClick={() => setEditTask(task.id)}>Edit</button>
-                      <button style={s.deleteBtn} onClick={() => handleDelete(task.id)}>Delete</button>
+                    <div className="task-meta">
+                      <span className={`badge badge-${task.status}`}>{STATUS_LABEL[task.status]}</span>
+                      <select className="status-select" value={task.status}
+                        onChange={(e) => handleUpdate(task.id, { status: e.target.value })}>
+                        <option value="pending">Pending</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="done">Done</option>
+                      </select>
+                      {task.owner_name && <span className="task-owner">by {task.owner_name}</span>}
                     </div>
-                  </div>
-                  <div style={s.taskMeta}>
-                    <span style={{ ...s.statusBadge, ...statusColors[task.status] }}>{task.status.replace('_', ' ')}</span>
-                    <select style={s.select} value={task.status}
-                      onChange={(e) => handleUpdate(task.id, { status: e.target.value })}>
-                      <option value="pending">Pending</option>
-                      <option value="in_progress">In Progress</option>
-                      <option value="done">Done</option>
-                    </select>
-                    {task.owner_name && <span style={{ color: '#444', fontSize: 12 }}>by {task.owner_name}</span>}
-                  </div>
-                </>
-              )}
-            </div>
-          ))
+                  </>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </main>
 
-      {toast && <div style={s.toast}>{toast}</div>}
+      {toast && (
+        <div className="toast">
+          <div className="toast-dot" />
+          {toast}
+        </div>
+      )}
     </div>
   );
 }
 
 function EditForm({ task, onSave, onCancel }) {
   const [form, setForm] = useState({ title: task.title, description: task.description || '' });
-  const inputStyle = { width: '100%', background: '#111', border: '1px solid #444', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 14, boxSizing: 'border-box', marginBottom: 10, outline: 'none' };
   return (
-    <div>
-      <input style={inputStyle} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-      <textarea style={{ ...inputStyle, resize: 'vertical' }} rows={2} value={form.description}
+    <div className="edit-form">
+      <input className="input" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+      <textarea className="textarea" rows={2} value={form.description}
         onChange={(e) => setForm({ ...form, description: e.target.value })} />
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={() => onSave(form)} style={{ background: '#4f46e5', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 13 }}>Save</button>
-        <button onClick={onCancel} style={{ background: '#333', color: '#fff', border: 'none', borderRadius: 6, padding: '6px 14px', cursor: 'pointer', fontSize: 13 }}>Cancel</button>
+      <div className="edit-actions">
+        <button className="btn btn-sm btn-save" onClick={() => onSave(form)}>Save</button>
+        <button className="btn btn-sm btn-ghost" onClick={onCancel}>Cancel</button>
       </div>
     </div>
   );
